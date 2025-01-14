@@ -1,0 +1,24 @@
+.dg1 {
+  display: grid;
+  gap: 10px;
+}
+.dg2 {
+  display: grid;
+  gap: 20px;
+}
+.dg3 {
+  display: grid;
+  gap: 30px;
+}
+
+.gtc-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+.gtc-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+.gtc-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }

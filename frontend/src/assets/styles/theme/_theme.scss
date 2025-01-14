@@ -1,0 +1,13 @@
+/* Import des fichiers de thème */
+@use "./light.scss";
+@use "./dark.scss";
+
+/* Default styles (light theme) */
+:root {
+  @extend :root from "./light.scss";
+}
+
+/* Dark theme styles */
+[data-theme="dark"] {
+  @extend :root from "./dark.scss";
+}

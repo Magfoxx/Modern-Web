@@ -1,0 +1,27 @@
+.header {
+  padding: 10px 20px;
+  background-color: var(--gray-1);
+  box-shadow: var(--box-shadow-nav);
+  color: var(--primary);
+  min-height: 100px;
+  min-width: 100%;
+  position: fixed;
+  z-index: 10000;
+
+  .logoContainer {
+    img {
+      width: 50px;
+      height: 50px;
+    }
+    p {
+      margin-bottom: 0;
+      font-weight: 700;
+    }
+  }
+  .nav {
+    .listNav {
+      cursor: pointer;
+      font-weight: 700;
+    }
+  }
+}
