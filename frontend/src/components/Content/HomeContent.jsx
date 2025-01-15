@@ -1,8 +1,8 @@
-import SectionWelcome from "../Home/SectionWelcome";
-import SectionServices from "../Home/SectionServices";
-import SectionProjects from "../Home/SectionsProjects";
-import SectionAvis from "../Home/SectionAvis";
-import SectionTarifs from "../Home/SectionTarifs";
+import SectionWelcome from "../Home/Welcome";
+import SectionServices from "../Home/Services";
+import SectionProjects from "../Home/Projects";
+import SectionAvis from "../Home/Avis";
+import SectionTarifs from "../Home/Tarifs";
 
 function HomeContent() {
   return (

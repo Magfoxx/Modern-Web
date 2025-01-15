@@ -1,98 +1,112 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useCallback } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useMemo, useCallback, useState } from "react";
 import styles from "./Header.module.scss";
 
 function Header() {
-  const location = useLocation();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [activeSection, setActiveSection] = useState("");
 
-  // Fonction pour gérer le scroll (mémorisée avec useCallback)
-  const scrollToSection = useCallback((id) => {
-    const section = document.getElementById(id);
-    if (section) {
-      const headerHeight = 100;
-      const sectionPosition = section.offsetTop;
-      window.scrollTo({
-        top: sectionPosition - headerHeight,
-        behavior: "smooth",
-      });
+  const sections = useMemo(
+    () => ["services", "projects", "avis", "tarifs"],
+    []
+  );
 
-      // Met à jour dynamiquement le hash dans l'URL
-      if (location.pathname === "/") {
-        if (window.history.pushState) {
-          const newUrl = `/#${id}`;
-          window.history.pushState({}, document.title, newUrl);
+  // Fonction : Scroll fluide vers une section spécifique
+  const scrollToSection = useCallback(
+    (id) => {
+      const section = document.getElementById(id);
+      if (section) {
+        window.scrollTo({
+          top: section.offsetTop - 100,
+          behavior: "smooth",
+        });
+        // Mettre à jour l'URL
+        if (location.hash !== `#${id}`) {
+          window.history.pushState({}, "", `/#${id}`);
         }
       }
-    }
-  }, [location.pathname]);
+    },
+    [location.hash]
+  );
 
-  // Gestion du clic sur un lien
-  const handleNavigation = (id) => {
-    if (location.pathname === "/") {
-      // Si déjà sur la page d'accueil, juste scroller et mettre à jour le hash
-      scrollToSection(id);
-    } else {
-      // Sinon, naviguer vers la page d'accueil et scroller
-      navigate(`/#${id}`);
-    }
-  };
+  // Fonction : Gérer le clic sur une section ou le logo
+  const handleNavigation = useCallback(
+    (id) => {
+      if (location.pathname === "/") {
+        if (id === "welcome") {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          window.history.pushState({}, "", `/#welcome`);
+        } else {
+          scrollToSection(id);
+        }
+      } else {
+        navigate(`/#${id}`);
+      }
+    },
+    [location.pathname, scrollToSection, navigate]
+  );
 
-  // Gérer le scroll automatique lorsqu'un hash est présent dans l'URL
+  // Détecte la section visible pendant le scroll
+  const detectActiveSection = useCallback(() => {
+    const headerHeight = 100;
+    const currentSection =
+      sections.find((id) => {
+        const section = document.getElementById(id);
+        const rect = section?.getBoundingClientRect();
+        return rect?.top <= headerHeight + 10 && rect?.bottom >= headerHeight + 10;
+      }) || (window.scrollY < 200 ? "welcome" : "");
+
+    if (currentSection && currentSection !== activeSection) {
+      setActiveSection(currentSection);
+      window.history.replaceState({}, "", `/#${currentSection}`);
+    }
+  }, [sections, activeSection]);
+
+  // Ajouter un listener pour le scroll
   useEffect(() => {
-    if (location.hash) {
-      const sectionId = location.hash.replace("#", ""); // Retire le "#" pour obtenir l'ID
+    if (location.pathname === "/") {
+      window.addEventListener("scroll", detectActiveSection);
+      return () => window.removeEventListener("scroll", detectActiveSection);
+    }
+  }, [location.pathname, detectActiveSection]);
+
+  // Scroll automatique si un hash est présent dans l'URL
+  useEffect(() => {
+    if (location.pathname === "/" && location.hash) {
+      const sectionId = location.hash.replace("#", "");
       scrollToSection(sectionId);
     }
-  }, [location, scrollToSection]); // Ajout de scrollToSection comme dépendance
+  }, [location, scrollToSection]);
 
   return (
-    <header
-      className={`${styles.header} d-flex jc-center ai-center jc-space-between p-30`}
-    >
-      <div
-        className={`${styles.logoContainer} logo d-flex jc-column ai-center gap-10`}
-      >
+    <header className={styles.header}>
+      <div onClick={() => handleNavigation("welcome")} className={styles.logoContainer}>
         <img src="#" alt="logo Modern Web" />
         <p>Modern Web</p>
       </div>
-      <nav className="d-flex jc-center">
-        <ul className={`${styles.nav} d-flex gap-50`}>
-          <li
-            className={styles.listNav}
-            onClick={() => handleNavigation("welcome")}
-          >
-            Accueil
+      <nav>
+        <ul className={styles.nav}>
+          {sections.map((section) => (
+            <li
+              key={section}
+              onClick={() => handleNavigation(section)}
+              className={`${styles.listNav} ${
+                activeSection === section ? styles.active : ""
+              }`}
+            >
+              {section.charAt(0).toUpperCase() + section.slice(1)}
+            </li>
+          ))}
+          <li>
+            <Link to="/blog" className={styles.listNav}>
+              Blog
+            </Link>
           </li>
-          <li
-            className={styles.listNav}
-            onClick={() => handleNavigation("services")}
-          >
-            Services
-          </li>
-          <li
-            className={styles.listNav}
-            onClick={() => handleNavigation("projects")}
-          >
-            Réalisations
-          </li>
-          <li
-            className={styles.listNav}
-            onClick={() => handleNavigation("avis")}
-          >
-            Avis
-          </li>
-          <li
-            className={styles.listNav}
-            onClick={() => handleNavigation("tarifs")}
-          >
-            Tarifs
-          </li>
-          <li className={styles.listNav}>
-            <Link to="/blog">Blog</Link>
-          </li>
-          <li className={styles.listNav}>
-            <Link to="/contact">Contact</Link>
+          <li>
+            <Link to="/contact" className={styles.listNav}>
+              Contact
+            </Link>
           </li>
         </ul>
       </nav>

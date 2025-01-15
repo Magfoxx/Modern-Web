@@ -1,27 +1,40 @@
+@use "../../../assets/styles/utils/mixins" as *;
+
 .header {
-  padding: 10px 20px;
+  @include space-between;
   background-color: var(--gray-1);
   box-shadow: var(--box-shadow-nav);
   color: var(--primary);
-  min-height: 100px;
-  min-width: 100%;
+  font-size: var(--font-size-large);
+  font-weight: 700;
+  padding: 30px;
+  height: 100px;
+  width: 100%;
   position: fixed;
   z-index: 10000;
 
   .logoContainer {
+    @include center-content;
+    cursor: pointer;
+    gap: 40px;
+
     img {
       width: 50px;
       height: 50px;
     }
-    p {
-      margin-bottom: 0;
-      font-weight: 700;
-    }
   }
+
   .nav {
+    @include space-between;
+    gap: 40px;
+
     .listNav {
       cursor: pointer;
-      font-weight: 700;
+      transition: color 0.2s ease-in-out;
+
+      &:hover {
+        color: var(--accent-2);
+      }
     }
   }
 }
